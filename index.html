@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>競艇AI予測 — 1マーク展開予想</title>
+<meta name="description" content="競艇の1マーク展開をAIで予測するプロジェクト。開発中。">
+<style>
+:root{
+  --navy-950:#081321; --navy-900:#0b1f33; --navy-800:#123049; --navy-700:#1b4166;
+  --ground:#f5f8fb; --panel:#ffffff; --panel-border:#dde6ee;
+  --ink:#0d1f30; --ink-soft:#4a5d70; --ink-faint:#8296a8;
+  --accent:#ff6a3d; --accent-ink:#7a2c11; --accent-soft:#ffe6da;
+  --warn:#e0a422; --warn-soft:#fdf1d9;
+  --font-jp: "Hiragino Sans","YuGothic","Yu Gothic UI","Meiryo","Segoe UI",sans-serif;
+  --font-num: ui-monospace,"SF Mono","Cascadia Mono","Consolas",monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root{ --ground:#081422; --panel:#0e2035; --panel-border:#1c3550; --ink:#eaf1f7; --ink-soft:#a9bccd; --ink-faint:#71879b;
+  --accent:#ff835b; --accent-ink:#ffd9c9; --accent-soft:#3a2013; --warn:#f0bc4d; --warn-soft:#3a2f11; }
+}
+:root[data-theme="dark"]{ --ground:#081422; --panel:#0e2035; --panel-border:#1c3550; --ink:#eaf1f7; --ink-soft:#a9bccd; --ink-faint:#71879b;
+  --accent:#ff835b; --accent-ink:#ffd9c9; --accent-soft:#3a2013; --warn:#f0bc4d; --warn-soft:#3a2f11; }
+:root[data-theme="light"]{ --ground:#f5f8fb; --panel:#ffffff; --panel-border:#dde6ee; --ink:#0d1f30; --ink-soft:#4a5d70; --ink-faint:#8296a8;
+  --accent:#ff6a3d; --accent-ink:#7a2c11; --accent-soft:#ffe6da; --warn:#e0a422; --warn-soft:#fdf1d9; }
+
+*{box-sizing:border-box;}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--font-jp);line-height:1.75;-webkit-font-smoothing:antialiased;}
+a{color:var(--accent);}
+.wrap{max-width:760px;margin:0 auto;padding:0 20px 80px;}
+
+header.hero{
+  background:linear-gradient(160deg,var(--navy-950) 0%,var(--navy-800) 60%,var(--navy-700) 100%);
+  color:#eaf1f7;padding:56px 20px 44px;
+}
+.hero-inner{max-width:760px;margin:0 auto;}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-family:var(--font-num);font-size:12px;letter-spacing:.12em;text-transform:uppercase;
+  color:#ffd9c9;background:rgba(255,106,61,.16);border:1px solid rgba(255,106,61,.35);padding:5px 12px;border-radius:999px;}
+.eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 4px rgba(255,106,61,.25);}
+h1{font-size:clamp(26px,5vw,36px);margin:18px 0 10px;font-weight:800;letter-spacing:-.01em;text-wrap:balance;}
+.hero p{color:#b9cad9;font-size:15px;max-width:56ch;margin:0;}
+
+main{padding-top:36px;}
+section{margin-bottom:36px;}
+h2{font-size:19px;font-weight:800;margin:0 0 10px;}
+p{color:var(--ink-soft);margin:0 0 12px;}
+
+.card{background:var(--panel);border:1px solid var(--panel-border);border-radius:16px;padding:22px 24px;box-shadow:0 1px 2px rgba(13,31,48,.06), 0 8px 24px -12px rgba(13,31,48,.18);}
+
+.status-badge{display:inline-flex;align-items:center;gap:8px;background:var(--warn-soft);color:var(--warn);border-radius:999px;padding:6px 14px;font-size:13px;font-weight:700;margin-bottom:14px;}
+.status-badge .dot{width:7px;height:7px;border-radius:50%;background:var(--warn);}
+
+.video-placeholder{
+  border:1px dashed var(--panel-border);border-radius:14px;aspect-ratio:16/9;
+  display:flex;align-items:center;justify-content:center;color:var(--ink-faint);font-size:14px;text-align:center;padding:20px;
+  background:repeating-linear-gradient(135deg, transparent 0 12px, rgba(130,150,168,.06) 12px 24px);
+}
+
+.channels{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px;}
+.channel{font-family:var(--font-num);font-size:12.5px;font-weight:700;padding:6px 12px;border-radius:999px;background:var(--accent-soft);color:var(--accent-ink);}
+
+footer{color:var(--ink-faint);font-size:12.5px;padding-top:20px;border-top:1px solid var(--panel-border);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+footer .f-updated{font-family:var(--font-num);}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-inner">
+    <span class="eyebrow"><span class="dot"></span>KYOTEI AI PREDICTION</span>
+    <h1>競艇 1マーク展開予想</h1>
+    <p>スタートから1マーク旋回までの各艇の動きを、実際のレース映像から再現・学習し、次のレースの展開を予測するプロジェクトです。</p>
+  </div>
+</header>
+
+<div class="wrap">
+<main>
+
+  <section>
+    <div class="card">
+      <span class="status-badge"><span class="dot"></span>開発中・実験段階</span>
+      <p style="margin:0;">このプロジェクトは現在、精度検証を続けながら開発を進めています。ここに掲載される予測は<strong style="color:var(--ink)">参考値であり、まだ実用的な精度には達していません。</strong>予測の的中や結果を保証するものではなく、賭け金の判断材料として使用しないでください。</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>最新の予測アニメーション</h2>
+    <p>近日公開予定です。手入力による実測データを積み上げながら、予測モデルの精度を継続的に検証しています。</p>
+    <div class="video-placeholder">動画は準備中です</div>
+  </section>
+
+  <section>
+    <h2>このプロジェクトについて</h2>
+    <p>実際のレース結果映像から各艇の真上から見た位置関係を人手で再現し、そのデータをもとに「1マークでどのような展開になりやすいか」を学習しています。順位の的中ではなく、各艇の動き・攻めの成否といった<strong style="color:var(--ink)">展開そのものの再現精度</strong>を重視しています。</p>
+  </section>
+
+  <section>
+    <h2>他のチャネル</h2>
+    <p>このプロジェクトの更新は、以下でも発信予定です。</p>
+    <div class="channels">
+      <span class="channel">LINE</span>
+      <span class="channel">X (Twitter)</span>
+      <span class="channel">note</span>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <span>競艇AI予測プロジェクト</span>
+  <span class="f-updated">最終更新: 2026-07-23</span>
+</footer>
+</div>
+
+</body>
+</html>
